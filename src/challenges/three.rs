@@ -5,7 +5,10 @@ pub fn compute_sum_of_priority_of_repeated_items() {
     let contents = read_file(file_path);
     let rucksacks: Vec<&str> = contents.split("\r\n").collect();
 
+    let all_my_rucksacks: Vec<String> = rucksacks.iter().map(|&s| s.into()).collect();
+
     let mut item_priority_sum = 0;
+    let mut item_priority_sum_second_part = 0;
 
     //First part
     for rucksack in rucksacks {
@@ -22,12 +25,29 @@ pub fn compute_sum_of_priority_of_repeated_items() {
         item_priority_sum
     );
 
-    //Second part
-    for i in 1..=300 {
-        let mut elves_rucksacks: Vec<&str> = ["", "", ""].to_vec();
+    let mut my_rucksacks: Vec<String> = vec![String::from(""); 3];
 
-        if i % 3 == 0 {}
+    //Second part
+    for i in 0..=300 {
+        if i % 3 == 0 && i > 0 {
+            my_rucksacks[2].replace_range(.., &all_my_rucksacks[i - 1]);
+            my_rucksacks[1].replace_range(.., &all_my_rucksacks[i - 2]);
+            my_rucksacks[0].replace_range(.., &all_my_rucksacks[i - 3]);
+
+            let repeated_item = look_for_item_in_three_compartments(
+                &my_rucksacks[0],
+                &my_rucksacks[1],
+                &my_rucksacks[2],
+            );
+
+            let item_priority = find_item_priority(repeated_item);
+            item_priority_sum_second_part += item_priority;
+        }
     }
+    println!(
+        "The sum of the priority of part two items is: {}",
+        item_priority_sum_second_part
+    );
 }
 
 pub fn look_for_item_in_both_compartments(
@@ -39,6 +59,25 @@ pub fn look_for_item_in_both_compartments(
             if item == other_item {
                 let repeated_item = other_item;
                 return repeated_item;
+            }
+        }
+    }
+    let place_holder = '_';
+    return place_holder;
+}
+
+pub fn look_for_item_in_three_compartments(
+    first_compartment: &String,
+    second_compartment: &String,
+    third_compartment: &String,
+) -> char {
+    for item in first_compartment.chars() {
+        for other_item in second_compartment.chars() {
+            for third_item in third_compartment.chars() {
+                if item == other_item && item == third_item {
+                    let repeated_item = item;
+                    return repeated_item;
+                }
             }
         }
     }
